@@ -1,0 +1,15 @@
+NAME         TWOEAT
+DESCRIPTION  'Two Eat One Board Game for Windows 1.03'
+STUB         'WINSTUB.EXE'
+CODE         PRELOAD MOVEABLE
+DATA         PRELOAD MOVEABLE MULTIPLE
+HEAPSIZE     12288
+STACKSIZE    12288
+
+EXPORTS
+    MainWndProc       @1
+    AboutDlgProc      @2
+    HelpDlgProc       @3
+    SettingsDlgProc   @4
+    SaveDlgProc       @5
+    LoadDlgProc       @6
