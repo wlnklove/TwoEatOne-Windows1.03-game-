@@ -1,0 +1,132 @@
+/* TWOEAT.RC - resource script (Windows 1.03) */
+
+#include "windows.h"
+
+/* Menu command IDs */
+#define IDM_NEWGAME       101
+#define IDM_CHALLENGE     102
+#define IDM_UNDO          103
+#define IDM_SAVE          104
+#define IDM_LOAD          105
+#define IDM_SETTINGS      106
+#define IDM_HELP          107
+#define IDM_ABOUT         108
+#define IDM_AI_MODE       109
+#define IDM_TWO_PLAYER    110
+
+/* Dialog control IDs */
+#define IDC_GRP_FIRSTHAND  201
+#define IDC_SET_DEFAULT    202
+#define IDC_SET_FIRST      203
+#define IDC_SET_SECOND     204
+#define IDC_GRP_COLORMODE  205
+#define IDC_SET_EGA        206
+#define IDC_SET_VGA        207
+#define IDC_SET_BRIGHT     208
+#define IDC_SAVE_EDIT      301
+#define IDC_SAVE_LIST      302
+#define IDC_SAVE_DELETE    303
+#define IDC_LOAD_LIST      401
+#define IDC_LOAD_DELETE    402
+
+AppIcon ICON TWOEAT.ICO
+/* Menu */
+MainMenu MENU
+BEGIN
+    POPUP "Game"
+    BEGIN
+        MENUITEM "New Game", IDM_NEWGAME
+        MENUITEM "Challenge Mode", IDM_CHALLENGE
+        MENUITEM SEPARATOR
+        MENUITEM "Undo", IDM_UNDO
+        MENUITEM SEPARATOR
+        MENUITEM "Save", IDM_SAVE
+        MENUITEM "Load", IDM_LOAD
+    END
+    POPUP "Options"
+    BEGIN
+        MENUITEM "AI Play", IDM_AI_MODE
+        MENUITEM "Two Player", IDM_TWO_PLAYER
+        MENUITEM SEPARATOR
+        MENUITEM "Settings", IDM_SETTINGS
+        MENUITEM SEPARATOR
+        MENUITEM "Help", IDM_HELP
+        MENUITEM "About", IDM_ABOUT
+    END
+END
+
+/* About dialog */
+AboutDlg DIALOG 22, 17, 144, 75
+STYLE WS_POPUP | WS_DLGFRAME
+BEGIN
+        ICON "AppIcon", -1, 10, 15, 32, 32      /* 图标：左对齐，垂直居中 */
+    CTEXT "Two Eat One", -1, 42, 5, 63, 10
+    CTEXT "Version 1.2", -1, 42, 20, 63, 10
+    CTEXT "by Xia Yuanyuan", -1, 42, 35, 63, 10
+    DEFPUSHBUTTON "OK", IDOK, 56, 55, 32, 14, WS_GROUP
+END
+
+/* Help dialog */
+HelpDlg DIALOG 22, 17, 280, 170
+STYLE WS_POPUP | WS_DLGFRAME
+BEGIN
+    CTEXT "Two Eat One - Rules", -1, 0, 5, 280, 12
+    CTEXT "Place pieces on 6x6 board intersections.", -1, 10, 25, 260, 12
+    CTEXT "Move: UP/DOWN/LEFT/RIGHT adjacent.", -1, 10, 40, 260, 12
+    CTEXT "Capture: two of yours flank one enemy.", -1, 10, 55, 260, 12
+    CTEXT "Four in a row = no capture.", -1, 10, 70, 260, 12
+    CTEXT "Challenge Mode:", -1, 10, 90, 260, 12
+    CTEXT "Pieces on cell centers, same capture rule.", -1, 10, 105, 260, 12
+    CTEXT "Mouse: Select/Move", -1, 10, 125, 130, 12
+    CTEXT "Keys: N=New  Z=Challenge  S=Save  L=Load  Q=Undo", -1, 10, 140, 260, 12
+    DEFPUSHBUTTON "OK", IDOK, 120, 155, 40, 14, WS_GROUP
+END
+
+/* Settings dialog */
+SettingsDlg DIALOG LOADONCALL MOVEABLE DISCARDABLE 39, 39, 222, 167
+CAPTION "TWO EAT ONE_settings"
+STYLE WS_BORDER | WS_CAPTION | WS_DLGFRAME | WS_POPUP
+BEGIN
+    GROUPBOX "First Hand", IDC_GRP_FIRSTHAND, 7, 8, 154, 94
+    RADIOBUTTON "Default (alternate)", IDC_SET_DEFAULT, 13, 24, 88, 12, WS_GROUP
+    RADIOBUTTON "Always First", IDC_SET_FIRST, 13, 58, 64, 12
+    RADIOBUTTON "Always Second", IDC_SET_SECOND, 13, 41, 61, 12
+        CTEXT "(The firs/second player setting only applies to brand-new games *V*)", -1, 8, 79, 152, 18
+
+    GROUPBOX "Board Color", IDC_GRP_COLORMODE, 7, 107, 154, 55
+    RADIOBUTTON "dusky Green", IDC_SET_EGA, 15, 125, 48, 12, WS_GROUP
+    RADIOBUTTON "blackish Green", IDC_SET_VGA, 74, 125, 67, 12
+    RADIOBUTTON "bright Green", IDC_SET_BRIGHT, 15, 142, 60, 12
+
+    DEFPUSHBUTTON "OK", IDOK,  171, 15, 40, 21
+    PUSHBUTTON "Cancel", IDCANCEL,  171, 43, 40, 21
+END
+
+/* Save dialog */
+SaveDlg DIALOG LOADONCALL MOVEABLE DISCARDABLE 22, 17, 180, 120
+CAPTION "Save Game"
+STYLE WS_POPUP | WS_CAPTION | WS_DLGFRAME
+BEGIN
+    LTEXT "Save Name:", -1, 10, 10, 60, 10
+    EDITTEXT IDC_SAVE_EDIT, 10, 22, 160, 12, ES_AUTOHSCROLL
+
+    LTEXT "Existing Saves:", -1, 10, 42, 80, 10
+    LISTBOX IDC_SAVE_LIST, 10, 54, 160, 36, WS_VSCROLL | WS_TABSTOP
+
+    DEFPUSHBUTTON "OK", IDOK, 10, 100, 35, 14
+    PUSHBUTTON "Delete", IDC_SAVE_DELETE, 55, 100, 35, 14
+    PUSHBUTTON "Cancel", IDCANCEL, 135, 100, 35, 14
+END
+
+/* Load dialog */
+LoadDlg DIALOG LOADONCALL MOVEABLE DISCARDABLE 22, 17, 180, 120
+CAPTION "Load Game"
+STYLE WS_POPUP | WS_CAPTION | WS_DLGFRAME
+BEGIN
+    LTEXT "Saved Games:", -1, 10, 10, 80, 10
+    LISTBOX IDC_LOAD_LIST, 10, 22, 160, 68, WS_VSCROLL | WS_TABSTOP
+
+    DEFPUSHBUTTON "OK", IDOK, 10, 100, 35, 14
+    PUSHBUTTON "Delete", IDC_LOAD_DELETE, 55, 100, 35, 14
+    PUSHBUTTON "Cancel", IDCANCEL, 135, 100, 35, 14
+END
