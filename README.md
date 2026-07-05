@@ -50,7 +50,7 @@ Play vs AI, save games, undo (press **Q**), and pick your board color. Wholesome
 
 ## 📸 游戏截图
 
-![ai对弈](./TwoEatOne/1.gif)
+![ai对弈](https://github.com/wlnklove/TwoEatOne-Windows1.03-game-/blob/main/TwoEatOne/img/000.gif)
 ![双人对弈](TwoEatOne/4.gif)
 ![挑战模式](TwoEatOne/2.gif)
 ![悔棋](TwoEatOne/3.gif)
