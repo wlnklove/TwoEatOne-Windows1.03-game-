@@ -54,7 +54,7 @@ Play vs AI, save games, undo (press **Q**), and pick your board color. Wholesome
 ![双人对弈](https://github.com/wlnklove/TwoEatOne-Windows1.03-game-/blob/main/TwoEatOne/img/4.gif)
 ![挑战模式](https://github.com/wlnklove/TwoEatOne-Windows1.03-game-/blob/main/TwoEatOne/img/2.gif)
 ![悔棋](https://github.com/wlnklove/TwoEatOne-Windows1.03-game-/blob/main/TwoEatOne/img/3.gif)
-![EGA换色](https://github.com/wlnklove/TwoEatOne-Windows1.03-game-/blob/main/TwoEatOne/img/4.gif)
+![EGA换色](https://github.com/wlnklove/TwoEatOne-Windows1.03-game-/blob/main/TwoEatOne/img/5.gif)
 ![256色](https://github.com/wlnklove/TwoEatOne-Windows1.03-game-/blob/main/TwoEatOne/img/000.gif)
 
 ---
