@@ -62,7 +62,7 @@ Play vs AI, save games, undo (press **Q**), and pick your board color. Wholesome
 
 | 文件 | 说明 |
 |------|------|
-| [TWOEAT.EXE] ()| Windows 1.03 可执行文件（Medium 内存模型）|
+| [TWOEAT.EXE] (https://github.com/wlnklove/TwoEatOne-Windows1.03-game-/releases/download/TwoEatOne/TWOEAT.EXE)| Windows 1.03 可执行文件（Medium 内存模型）|
 ---
 
 ## 🛠️ 从源码编译
@@ -152,7 +152,7 @@ twoeat/
 
 ## 🙏 致谢
 
-- **乌班图**：技术协作、Bug 分析、代码审查
+- **glm**：技术协作、Bug 分析、代码审查
 - **ima**：审核api函数是否符合Windows1.03标准
 - **Microsoft Windows 1.03 SDK**：1985 年的经典平台
 - **DOSBox**：让 2026 年的我们还能玩到 1985 年的系统
