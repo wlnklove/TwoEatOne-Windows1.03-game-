@@ -62,7 +62,7 @@ Play vs AI, save games, undo (press **Q**), and pick your board color. Wholesome
 
 | 文件 | 说明 |
 |------|------|
-| `TWOEAT.EXE` | Windows 1.03 可执行文件（Medium 内存模型）|
+| [TWOEAT.EXE] ()| Windows 1.03 可执行文件（Medium 内存模型）|
 ---
 
 ## 🛠️ 从源码编译
