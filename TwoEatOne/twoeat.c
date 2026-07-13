@@ -27,6 +27,7 @@ FARPROC lpProcHelp = NULL;
 FARPROC lpProcSettings = NULL;
 FARPROC lpProcSave = NULL;
 FARPROC lpProcLoad = NULL;
+FARPROC lpProcDirtyRect = NULL;
 
 GameState gameState;             /* 游戏状态 */
 BoardLayout boardLayout;         /* 棋盘布局 */
@@ -37,15 +38,10 @@ HBRUSH hbrBackground = NULL;     /* 背景画刷 */
 HCURSOR hCursorArrow = NULL;     /* 标准箭头光标 */
 char szAppName[] = "TwoEatOne";  /* 窗口类名 */
 
-/* 持久化双缓冲已废弃——改用棋盘区域临时双缓冲
- * 旧代码创建整个客户区大小的位图，最大化时 640×350 4bpp ≈ 56KB
- * 286 GDI 堆仅 64KB，创建失败 → 回退直接画屏 → 闪烁
- * 新方案只创建棋盘大小的位图（约 300×300 ≈ 22KB），不会失败
- *
- * 以下全局变量保留不删（零副作用，避免改链接配置） */
-static HDC hBackDC = NULL;
-static HBITMAP hBackBitmap = NULL;
-static HBITMAP hBackOldBitmap = NULL;
+/* 持久化双缓冲位图（非 static，供 dirtyrect.c 访问） */
+HDC hBackDC = NULL;
+HBITMAP hBackBitmap = NULL;
+HBITMAP hBackOldBitmap = NULL;
 
 /* --------------------------------------------------------------------
  * WinMain - 程序入口点
@@ -244,20 +240,26 @@ LONG lParam;
      * lParam = 新的客户区尺寸（LOWORD=宽, HIWORD=高）
      * ---------------------------------------------------------------- */
     case WM_SIZE:
-	{
-		CalcBoardLayout(LOWORD(lParam), HIWORD(lParam));
+        {
+                CalcBoardLayout(LOWORD(lParam), HIWORD(lParam));
 
-		/* 窗口大小变了，销毁旧位图，WM_PAINT 会按新棋盘尺寸重建 */
-		if (hBackDC != NULL && hBackBitmap != NULL) {
-			SelectObject(hBackDC, hBackOldBitmap);
-			DeleteObject(hBackBitmap);
-			hBackBitmap = NULL;
-			hBackOldBitmap = NULL;
-		}
+                /* 窗口大小变了，销毁旧位图，WM_PAINT 会按新棋盘尺寸重建 */
+                if (hBackDC != NULL && hBackBitmap != NULL) {
+                        SelectObject(hBackDC, hBackOldBitmap);
+                        DeleteObject(hBackBitmap);
+                        hBackBitmap = NULL;
+                        hBackOldBitmap = NULL;
+                }
 
-		InvalidateRect(hWnd, NULL, FALSE);
-		return 0L;
-	}
+                /* 脏矩形模式下窗口大小变了，重建资源 */
+                if (g_dirtyEnabled) {
+                    FreeCellBuffers();
+                    InitCellBuffers(hWnd);
+                }
+
+                InvalidateRect(hWnd, NULL, FALSE);
+                return 0L;
+        }
 
     /* ----------------------------------------------------------------
      * WM_ERASEBKGND - 擦除背景
@@ -305,6 +307,16 @@ LONG lParam;
         hdc = BeginPaint(hWnd, &ps);
         GetClientRect(hWnd, &rc);
         CalcBoardLayout(rc.right, rc.bottom);
+
+        /* === 脏矩形模式：交给 dirtyrect.c 处理 === */
+        if (g_dirtyEnabled) {
+            if (DirtyRectPaint(hWnd, hdc, &ps)) {
+                EndPaint(hWnd, &ps);
+                return 0L;
+            }
+        }
+
+        /* === 原始双缓冲路径（脏矩形禁用时） === */
 
         /* 棋盘区域（含阴影） */
         rcBoard.left   = boardLayout.baseRect.left;
@@ -460,9 +472,14 @@ LONG lParam;
             /* ---- 未选中棋子状态：尝试选中 ---- */
             if (gameState.board[row][col] == gameState.currentPlayer) {
                 /* 选中当前走棋方的棋子 */
+                int oldR = gameState.selRow;
+                int oldC = gameState.selCol;
                 gameState.selRow = row;
                 gameState.selCol = col;
-                InvalidateRect(hWnd, NULL, FALSE);
+                if (g_dirtyEnabled)
+                    DirtyRectInvalidateSelect(hWnd, oldR, oldC, row, col);
+                else
+                    InvalidateRect(hWnd, NULL, FALSE);
             } else {
                 /* 点击了空位或对方棋子，蜂鸣提示 */
                 MessageBeep(0);
@@ -471,22 +488,41 @@ LONG lParam;
             /* ---- 已选中棋子状态：尝试走棋 ---- */
             if (row == gameState.selRow && col == gameState.selCol) {
                 /* 点击同一棋子：取消选中 */
+                int oldR = gameState.selRow;
+                int oldC = gameState.selCol;
                 gameState.selRow = -1;
                 gameState.selCol = -1;
-                InvalidateRect(hWnd, NULL, FALSE);
+                if (g_dirtyEnabled)
+                    DirtyRectInvalidateSelect(hWnd, oldR, oldC, -1, -1);
+                else
+                    InvalidateRect(hWnd, NULL, FALSE);
             } else if (gameState.board[row][col] == gameState.currentPlayer) {
                 /* 点击另一颗己方棋子：切换选中 */
+                int oldR = gameState.selRow;
+                int oldC = gameState.selCol;
                 gameState.selRow = row;
                 gameState.selCol = col;
-                InvalidateRect(hWnd, NULL, FALSE);
+                if (g_dirtyEnabled)
+                    DirtyRectInvalidateSelect(hWnd, oldR, oldC, row, col);
+                else
+                    InvalidateRect(hWnd, NULL, FALSE);
             } else if (gameState.board[row][col] == EMPTY) {
                 /* 点击空位：尝试走棋 */
                 if (IsValidMove(gameState.selRow, gameState.selCol, row, col)) {
                     /* 执行走棋 */
+                    int oldB[BOARD_SIZE][BOARD_SIZE];
+                    int fr = gameState.selRow;
+                    int fc = gameState.selCol;
+                    /* 保存旧棋盘用于脏矩形对比 */
+                    if (g_dirtyEnabled)
+                        memcpy(oldB, gameState.board, sizeof(oldB));
                     MakeMove(gameState.selRow, gameState.selCol, row, col);
                     gameState.selRow = -1;
                     gameState.selCol = -1;
-                    InvalidateRect(hWnd, NULL, FALSE);
+                    if (g_dirtyEnabled)
+                        DirtyRectInvalidateBoardDiff(hWnd, oldB, gameState.board);
+                    else
+                        InvalidateRect(hWnd, NULL, FALSE);
 
                     /* 检查游戏是否结束 */
                     if (gameState.gameOver) {
@@ -523,8 +559,15 @@ LONG lParam;
             }
             /* 仅 AI 模式下且轮到黑棋时执行 AI 走棋 */
             if (!gameState.gameOver && gameState.currentPlayer == BLACK && !gameState.twoPlayer) {
-                DoAIMove();
-                InvalidateRect(hWnd, NULL, FALSE);
+                if (g_dirtyEnabled) {
+                    int oldB[BOARD_SIZE][BOARD_SIZE];
+                    memcpy(oldB, gameState.board, sizeof(oldB));
+                    DoAIMove();
+                    DirtyRectInvalidateBoardDiff(hWnd, oldB, gameState.board);
+                } else {
+                    DoAIMove();
+                    InvalidateRect(hWnd, NULL, FALSE);
+                }
                 if (gameState.gameOver) {
                     EndGame(gameState.gameOver);
                 }
@@ -643,6 +686,21 @@ LONG lParam;
             }
             break;
 
+        case IDM_DIRTYRECT:
+            /* 打开脏矩形设置对话框（无模式） */
+            if (hModelessDlg != NULL)
+                BringWindowToTop(hModelessDlg);
+            else {
+                lpProcDirtyRect = MakeProcInstance((FARPROC)DirtyRectDlgProc, hInst);
+                if (lpProcDirtyRect == NULL) break;
+                hModelessDlg = CreateDialog(hInst, "DirtyRectDlg", hWnd, lpProcDirtyRect);
+                if (hModelessDlg != NULL) {
+                    ShowWindow(hModelessDlg, 1);
+                    BringWindowToTop(hModelessDlg);
+                }
+            }
+            break;
+
         case IDM_HELP:
             /* 打开帮助对话框（模态） */
             lpProcHelp = MakeProcInstance((FARPROC)HelpDlgProc, hInst);
@@ -693,7 +751,10 @@ LONG lParam;
      * ---------------------------------------------------------------- */
     case WM_DESTROY:
     {
-        /* 清理资源（hBackDC/hBackBitmap 为旧持久化缓冲残留，正常情况下已 NULL） */
+        /* 清理脏矩形资源 */
+        DirtyRectCleanup();
+
+        /* 清理持久化双缓冲 */
         if (hBackDC != NULL) {
             if (hBackBitmap != NULL) {
                 SelectObject(hBackDC, hBackOldBitmap);

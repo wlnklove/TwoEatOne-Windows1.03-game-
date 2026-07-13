@@ -13,3 +13,4 @@ EXPORTS
     SettingsDlgProc   @4
     SaveDlgProc       @5
     LoadDlgProc       @6
+    DirtyRectDlgProc  @7

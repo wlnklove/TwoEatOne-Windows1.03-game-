@@ -502,3 +502,102 @@ LONG lParam;
     }
     return FALSE;
 }
+
+/* ====================================================================
+ * DirtyRectDlgProc - 脏矩形设置对话框过程（非模态）
+ * ==================================================================== */
+
+/* g_dirtyEnabled / g_dirtyMode 在 twoeat.h 中声明 */
+
+BOOL FAR PASCAL DirtyRectDlgProc(hDlg, message, wParam, lParam)
+HWND hDlg;
+unsigned message;
+WORD wParam;
+LONG lParam;
+{
+    switch (message) {
+
+    case WM_INITDIALOG:
+    {
+        int i;
+        HMENU hMenu;
+
+        CheckDlgButton(hDlg, IDC_DR_ENABLE, g_dirtyEnabled ? 1 : 0);
+
+        for (i = IDC_DR_DC; i <= IDC_DR_CELL; i++)
+            CheckDlgButton(hDlg, i, 0);
+        CheckDlgButton(hDlg, IDC_DR_DC + g_dirtyMode, 1);
+
+        EnableWindow(GetDlgItem(hDlg, IDC_DR_DC), g_dirtyEnabled);
+        EnableWindow(GetDlgItem(hDlg, IDC_DR_PARTIAL), g_dirtyEnabled);
+        EnableWindow(GetDlgItem(hDlg, IDC_DR_CELL), g_dirtyEnabled);
+
+        hMenu = GetMenu(hWndMain);
+        if (hMenu)
+            CheckMenuItem(hMenu, IDM_DIRTYRECT,
+                          g_dirtyEnabled ? MF_CHECKED : MF_UNCHECKED);
+
+        SetFocus(GetDlgItem(hDlg, IDOK));
+        return FALSE;
+    }
+
+    case WM_COMMAND:
+    {
+        switch (wParam) {
+
+        case IDC_DR_ENABLE:
+        {
+            int newVal = (IsDlgButtonChecked(hDlg, IDC_DR_ENABLE) == 0) ? 1 : 0;
+            CheckDlgButton(hDlg, IDC_DR_ENABLE, newVal);
+
+            if (newVal) {
+                g_dirtyEnabled = 1;
+                DirtyRectEnterMode(hWndMain);
+            } else {
+                DirtyRectExitMode();
+                g_dirtyEnabled = 0;
+            }
+
+            EnableWindow(GetDlgItem(hDlg, IDC_DR_DC), newVal);
+            EnableWindow(GetDlgItem(hDlg, IDC_DR_PARTIAL), newVal);
+            EnableWindow(GetDlgItem(hDlg, IDC_DR_CELL), newVal);
+
+            {
+                HMENU hMenu = GetMenu(hWndMain);
+                if (hMenu)
+                    CheckMenuItem(hMenu, IDM_DIRTYRECT,
+                                  newVal ? MF_CHECKED : MF_UNCHECKED);
+            }
+
+            InvalidateRect(hWndMain, NULL, FALSE);
+            return TRUE;
+        }
+
+        case IDC_DR_DC:
+        case IDC_DR_PARTIAL:
+        case IDC_DR_CELL:
+        {
+            CheckRadioButton(hDlg, IDC_DR_DC, IDC_DR_CELL, wParam);
+            DirtyRectSetMode(hWndMain, wParam - IDC_DR_DC);
+            InvalidateRect(hWndMain, NULL, FALSE);
+            return TRUE;
+        }
+
+        case IDOK:
+        case IDCANCEL:
+            DestroyWindow(hDlg);
+            return TRUE;
+        }
+        break;
+    }
+
+    case WM_CLOSE:
+        DestroyWindow(hDlg);
+        return TRUE;
+
+    case WM_DESTROY:
+        hModelessDlg = NULL;
+        break;
+    }
+    return FALSE;
+}

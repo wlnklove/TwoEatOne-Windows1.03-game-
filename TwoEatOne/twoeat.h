@@ -21,6 +21,7 @@
 #define IDM_ABOUT         108   /* 菜单：关于 */
 #define IDM_AI_MODE       109   /* 菜单：AI对弈模式 */
 #define IDM_TWO_PLAYER    110   /* 菜单：双人对弈模式 */
+#define IDM_DIRTYRECT     111   /* 菜单：脏矩形设置 */
 
 /* 系统菜单中"关于"项的 ID（必须 < 0xF000 避免与系统命令冲突） */
 #define IDM_SYSABOUT      0x0010
@@ -37,6 +38,12 @@
 #define IDC_SET_EGA        206  /* 单选：暗绿 */
 #define IDC_SET_VGA        207  /* 单选：深绿 */
 #define IDC_SET_BRIGHT     208  /* 单选：亮绿 */
+
+/* 脏矩形设置对话框 */
+#define IDC_DR_ENABLE      209  /* 复选框：开启脏矩形 */
+#define IDC_DR_DC          210  /* 单选：DC Direct 模式 */
+#define IDC_DR_PARTIAL     211  /* 单选：Partial Update 模式 */
+#define IDC_DR_CELL        212  /* 单选：Cell Buffer 模式 */
 
 /* 存档对话框 */
 #define IDC_SAVE_EDIT      301  /* 编辑框：存档名称 */
@@ -70,6 +77,11 @@
 #define MAX_HISTORY       50    /* 最多悔棋步数 */
 #define MAX_SAVES         20    /* 最多存档数 */
 #define SAVE_NAME_LEN     32    /* 存档名最大长度 */
+
+/* 脏矩形模式（值从 0 开始，与对话框 IDC_DR_DC 偏移对应） */
+#define DR_DC              0    /* DC Direct 模式 */
+#define DR_PARTIAL         1    /* Partial Update 模式 */
+#define DR_CELL            2    /* Cell Buffer 模式 */
 
 /* --------------------------------------------------------------------
  * 棋盘布局结构体
@@ -157,6 +169,15 @@ extern int historyCurrent;        /* 当前历史位置 */
 extern HBRUSH hbrBackground;      /* 背景画刷 */
 extern HCURSOR hCursorArrow;      /* 箭头光标 */
 
+/* 持久化双缓冲 DC（dirtyrect.c 也需要访问） */
+extern HDC hBackDC;
+extern HBITMAP hBackBitmap;
+extern HBITMAP hBackOldBitmap;
+
+/* 脏矩形全局变量 */
+extern int g_dirtyEnabled;
+extern int g_dirtyMode;
+
 /* --------------------------------------------------------------------
  * 函数原型声明（K&R 风格，无参数类型）
  * -------------------------------------------------------------------- */
@@ -179,6 +200,7 @@ void DrawPieces();
 void DrawPiece();
 BOOL BoardHitTest();
 void GetPieceCenter();
+void GetPieceRect();          /* 新增：获取棋子屏幕矩形 */
 
 /* game.c */
 void InitBoard();
@@ -206,6 +228,23 @@ BOOL FAR PASCAL HelpDlgProc();
 BOOL FAR PASCAL SettingsDlgProc();
 BOOL FAR PASCAL SaveDlgProc();
 BOOL FAR PASCAL LoadDlgProc();
+BOOL FAR PASCAL DirtyRectDlgProc();
+
+/* dirtyrect.c */
+void DirtyRectEnable();
+void DirtyRectSetMode();
+void DirtyRectInvalidatePiece();
+void DirtyRectInvalidateSelect();
+void DirtyRectInvalidateMove();
+void DirtyRectInvalidateBoardDiff();
+int  DirtyRectPaint();
+void DirtyRectEnterMode();
+void DirtyRectExitMode();
+void DirtyRectCleanup();
+void InitCellBuffers();
+void FreeCellBuffers();
+void RenderCellBitmap();
+void RenderCleanBoard();
 
 /* twoeat.c 中定义的 MakeProcInstance thunk 指针
  * Win 1.03 下直接传函数指针给 CreateDialog/DialogBox 会导致 DS 数据段
@@ -223,6 +262,7 @@ extern FARPROC lpProcHelp;
 extern FARPROC lpProcSettings;
 extern FARPROC lpProcSave;
 extern FARPROC lpProcLoad;
+extern FARPROC lpProcDirtyRect;
 
 /* save.c */
 void EnsureSaveDir();
@@ -232,8 +272,6 @@ int GetSaveList();
 void GetSaveFileName();
 BOOL LoadLatestSave();
 BOOL DeleteSave();
-
-
 
 /* 图标资源 ID */
 #define IDI_APPICON 500

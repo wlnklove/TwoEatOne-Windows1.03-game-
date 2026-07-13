@@ -347,6 +347,28 @@ int *pX, *pY;
 }
 
 /* --------------------------------------------------------------------
+ * GetPieceRect - 获取棋子所在的屏幕矩形区域
+ *
+ * 返回包含棋子 + 高亮环的矩形，用于脏矩形刷新。
+ * 半径 = cellSize/3 + 6（棋子半径 cellSize/3 + 高亮余量 6）。
+ * -------------------------------------------------------------------- */
+void GetPieceRect(row, col, prc)
+int row, col;
+RECT *prc;
+{
+    int px, py;
+    int r;
+
+    GetPieceCenter(row, col, &px, &py);
+    r = boardLayout.cellSize / 3 + 6;
+
+    prc->left = px - r;
+    prc->top = py - r;
+    prc->right = px + r;
+    prc->bottom = py + r;
+}
+
+/* --------------------------------------------------------------------
  * BoardHitTest - 鼠标点击检测
  *
  * 将鼠标坐标转换为棋盘行列号。
