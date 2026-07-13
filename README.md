@@ -62,7 +62,8 @@ Play vs AI, save games, undo (press **Q**), and pick your board color. Wholesome
 
 | 文件 | 说明 |
 |------|------|
-| TWOEAT.EXE| Windows 1.03 可执行文件（Medium 内存模型）|
+| v1.2(https://github.com/wlnklove/TwoEatOne-Windows1.03-game-/releases/download/v1.2/TwoEat.exe)| Windows 1.03 可执行文件（Medium 内存模型）|
+| v2.0(https://github.com/wlnklove/TwoEatOne-Windows1.03-game-/releases/download/v2.0/TwoEat.exe)|Windows 1.03 可执行文件（Medium 内存模型）|
 ---
 
 ## 🛠️ 从源码编译
@@ -115,6 +116,10 @@ twoeat/
 ---
 
 ## 📝 版本历史
+### v2.0（2026-07-11
+
+- **增加脏矩形模式**： 三个模式gdi绘制、小位图、脏更新！若出现闪烁可以尝试此功能
+
 
 ### v1.2 (2026-07-05)
 
@@ -158,6 +163,23 @@ twoeat/
 - **DOSBox**：让 2026 年的我们还能玩到 1985 年的系统
 
 ---
+
+## 🐛关于平台的说明与当下问题
+
+- 本软件专门给Windows1.x编写，Windows2.x也可以运行！Windows3以上请使用兼容模式运行~
+- 若要使用Windows10/11平台运行可以使用otvdm兼容运行时！
+- **Windows1 256色** ：在im1024显示卡下游戏是闪烁的可以使用脏矩形模式减轻但不能消除闪烁！！！
+- **winddows1 16色 800*600 VESA驱动**：在VESA驱动下会发声棋盘闪烁请减小棋盘视口大小可消除！！！
+- **Windows2 256色** ：在8514/a 256色模式下全屏或者大视口的情况下点击棋子、走棋会很慢，可以减小棋盘视口消除该现象！！！
+- **EGA VGA** ：官方驱动下运行正常，有问题可以反馈！！！
+
+## English Translation (Accurate, Retro Windows Tech Terminology)
+- This software is developed exclusively for Windows 1.x, and it is also compatible with Windows 2.x! For Windows 3 and later versions, please run it in compatibility mode.
+- To run this program on Windows 10 / 11, use the OTVDM compatibility runtime.
+- **Windows 1 256-color mode**: The game exhibits screen flickering when using an IM1024 graphics card. Dirty rect rendering can reduce flickering but cannot eliminate it entirely.
+- **Windows 1 16-color 800×600 VESA driver**: Severe board flickering occurs under VESA drivers. Resizing the game viewport to a smaller dimension will resolve this issue.
+- **Windows 2 256-color mode**: Large or full-screen viewports with the 8514/a 256-color driver cause lag when clicking pieces or executing moves. Reducing the board viewport size fixes this slowdown.
+- **EGA / VGA**: The program runs normally with official display drivers. Feel free to submit feedback if you encounter any issues.
 
 ## 📜 许可证
 
