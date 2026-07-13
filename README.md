@@ -62,8 +62,7 @@ Play vs AI, save games, undo (press **Q**), and pick your board color. Wholesome
 
 | 文件 | 说明 |
 |------|------|
-| v1.2(https://github.com/wlnklove/TwoEatOne-Windows1.03-game-/releases/download/v1.2/TwoEat.exe)| Windows 1.03 可执行文件（Medium 内存模型）|
-| v2.0(https://github.com/wlnklove/TwoEatOne-Windows1.03-game-/releases/download/v2.0/TwoEat.exe)|Windows 1.03 可执行文件（Medium 内存模型）|
+|[v1.2] (https://github.com/wlnklove/TwoEatOne-Windows1.03-game-/releases/download/TwoEatOne/TWOEAT.EXE)、[V2.0](https://github.com/wlnklove/TwoEatOne-Windows1.03-game-/releases/download/v2.0/TWOEAT.EXE)| Windows 1.03 可执行文件（Medium 内存模型）|
 ---
 
 ## 🛠️ 从源码编译
