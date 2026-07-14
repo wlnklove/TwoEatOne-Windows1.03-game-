@@ -166,7 +166,7 @@ twoeat/
 ## 🐛关于平台的说明与当下问题
 
 - 本软件专门给Windows1.x编写，Windows2.x也可以运行！Windows3以上请使用兼容模式运行~
-- 若要使用Windows10/11平台运行可以使用otvdm兼容运行时！
+- 若要使用Windows10/11平台运行可以使用[otvdm兼容运行时](https://github.com/otya128/winevdm)！
 - **Windows1 256色** ：在im1024显示卡下游戏是闪烁的可以使用脏矩形模式减轻但不能消除闪烁！！！
 - **winddows1 16色 800*600 VESA驱动**：在VESA驱动下会发声棋盘闪烁请减小棋盘视口大小可消除！！！
 - **Windows2 256色** ：在8514/a 256色模式下全屏或者大视口的情况下点击棋子、走棋会很慢，可以减小棋盘视口消除该现象！！！
@@ -174,7 +174,7 @@ twoeat/
 
 ## English Translation (Accurate, Retro Windows Tech Terminology)
 - This software is developed exclusively for Windows 1.x, and it is also compatible with Windows 2.x! For Windows 3 and later versions, please run it in compatibility mode.
-- To run this program on Windows 10 / 11, use the OTVDM compatibility runtime.
+- To run this program on Windows 10 / 11, use the [OTVDM](https://github.com/otya128/winevdm) compatibility runtime.
 - **Windows 1 256-color mode**: The game exhibits screen flickering when using an IM1024 graphics card. Dirty rect rendering can reduce flickering but cannot eliminate it entirely.
 - **Windows 1 16-color 800×600 VESA driver**: Severe board flickering occurs under VESA drivers. Resizing the game viewport to a smaller dimension will resolve this issue.
 - **Windows 2 256-color mode**: Large or full-screen viewports with the 8514/a 256-color driver cause lag when clicking pieces or executing moves. Reducing the board viewport size fixes this slowdown.
